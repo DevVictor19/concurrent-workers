@@ -4,8 +4,6 @@ services:
     container_name: concurrent-workers-redis
     ports:
       - '6379:6379'
-    volumes:
-      - redis-data:/data
     networks:
       - app-network
     healthcheck:
@@ -24,6 +22,8 @@ services:
       - PORT=3000
       - REDIS_HOST=redis
       - REDIS_PORT=6379
+      - API_TOKENS=token1,token2,token3
+      - TOKEN_REQUEST_LIMIT_MS=6000
     depends_on:
       redis:
         condition: service_healthy
@@ -41,6 +41,8 @@ services:
       - PORT=3000
       - REDIS_HOST=redis
       - REDIS_PORT=6379
+      - API_TOKENS=token1,token2,token3
+      - TOKEN_REQUEST_LIMIT_MS=6000
     depends_on:
       redis:
         condition: service_healthy
@@ -58,6 +60,8 @@ services:
       - PORT=3000
       - REDIS_HOST=redis
       - REDIS_PORT=6379
+      - API_TOKENS=token1,token2,token3
+      - TOKEN_REQUEST_LIMIT_MS=6000
     depends_on:
       redis:
         condition: service_healthy
@@ -79,10 +83,6 @@ services:
     networks:
       - app-network
     restart: unless-stopped
-
-volumes:
-  redis-data:
-    driver: local
 
 networks:
   app-network:

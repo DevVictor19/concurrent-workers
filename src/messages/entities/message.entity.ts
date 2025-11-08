@@ -30,6 +30,12 @@ export class Message {
     return message;
   }
 
+  public static with(props: MessageProps): Message {
+    const message = new Message();
+    message.props = props;
+    return message;
+  }
+
   get id(): string {
     return this.props.id;
   }

@@ -1,6 +1,6 @@
 import { Body, Controller, Post } from '@nestjs/common';
-import { MessagesService } from './messages.service';
 import type { SendMessagesRequest } from './dtos';
+import { MessagesService } from './services';
 
 @Controller({
   path: 'messages',

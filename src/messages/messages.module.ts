@@ -1,10 +1,10 @@
 import { Module } from '@nestjs/common';
-import { MessagesService } from './messages.service';
 import { MessagesController } from './messages.controller';
 import { BullModule } from '@nestjs/bullmq';
 import { ConfigService } from '@nestjs/config';
 import { QUEUES } from './constants';
 import { SendMessagesProcessor } from './processors';
+import { MessagesService, TokenBucketService } from './services';
 
 @Module({
   imports: [
@@ -22,6 +22,6 @@ import { SendMessagesProcessor } from './processors';
     }),
   ],
   controllers: [MessagesController],
-  providers: [MessagesService, SendMessagesProcessor],
+  providers: [SendMessagesProcessor, MessagesService, TokenBucketService],
 })
 export class MessagesModule {}
