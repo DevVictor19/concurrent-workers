@@ -1,25 +1,26 @@
 import { Injectable, Logger } from '@nestjs/common';
 import { MessageDto } from './dtos';
-import { setTimeout } from 'node:timers/promises';
 import { Message } from './entities';
+import { Queue } from 'bullmq';
+import { InjectQueue } from '@nestjs/bullmq';
+import { QUEUES } from './constants';
 
 @Injectable()
 export class MessagesService {
   private readonly logger = new Logger(MessagesService.name);
 
-  async batchMessages(messages: MessageDto[]): Promise<void> {
-    try {
-      for (const m of messages) {
-        const message = Message.create(m.subject, m.body, m.to);
-        this.logger.debug(`Created message with ID: ${message.id}`);
+  constructor(
+    @InjectQueue(QUEUES.MESSAGE_SEND_QUEUE)
+    private readonly sendMessagesQueue: Queue,
+  ) {}
 
-        await setTimeout(1000);
-      }
-    } catch (error) {
-      this.logger.error(
-        'Error processing batch messages',
-        error instanceof Error ? error.stack : String(error),
-      );
+  async batchMessages(messages: MessageDto[]): Promise<void> {
+    for (const m of messages) {
+      const message = Message.create(m.subject, m.body, m.to);
+      await this.sendMessagesQueue.add('message', message.toJSON(), {
+        jobId: message.id,
+      });
+      this.logger.debug(`Created message with ID: ${message.id}`);
     }
   }
 }

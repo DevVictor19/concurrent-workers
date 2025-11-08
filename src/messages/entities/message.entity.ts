@@ -45,4 +45,8 @@ export class Message {
   get to(): string {
     return this.props.to;
   }
+
+  public toJSON(): MessageProps {
+    return { ...this.props };
+  }
 }

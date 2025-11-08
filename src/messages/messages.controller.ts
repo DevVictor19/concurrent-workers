@@ -10,7 +10,7 @@ export class MessagesController {
   constructor(private readonly messagesService: MessagesService) {}
 
   @Post('batch')
-  batchMessages(@Body() body: SendMessagesRequest): void {
-    void this.messagesService.batchMessages(body.messages);
+  async batchMessages(@Body() body: SendMessagesRequest): Promise<void> {
+    await this.messagesService.batchMessages(body.messages);
   }
 }
