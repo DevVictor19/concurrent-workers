@@ -5,8 +5,6 @@ import { MessageProps } from '../entities';
 import { Logger } from '@nestjs/common';
 import { setTimeout } from 'node:timers/promises';
 
-export * from './send-messages.processor';
-
 @Processor(QUEUES.MESSAGE_SEND_QUEUE)
 export class SendMessagesProcessor extends WorkerHost {
   private readonly logger = new Logger(SendMessagesProcessor.name);
