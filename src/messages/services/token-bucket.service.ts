@@ -10,7 +10,15 @@ export class TokenBucketService implements OnModuleInit {
   private readonly redisClient: RedisClientType;
   private readonly apiTokens: string[];
   private readonly tokenRequestLimitMs: number;
-  private readonly LOCK_TTL_MS = 5000;
+  private readonly LOCK_TTL_MS = 10000;
+
+  private readonly UNLOCK_SCRIPT = `
+    if redis.call("get", KEYS[1]) == ARGV[1] then
+      return redis.call("del", KEYS[1])
+    else
+      return 0
+    end
+  `;
 
   constructor(configService: ConfigService) {
     this.redisClient = createClient({
@@ -18,7 +26,7 @@ export class TokenBucketService implements OnModuleInit {
     });
 
     this.apiTokens = configService.getOrThrow<string>('API_TOKENS').split(',');
-    this.tokenRequestLimitMs = configService.getOrThrow<number>(
+    this.tokenRequestLimitMs = +configService.getOrThrow<string>(
       'TOKEN_REQUEST_LIMIT_MS',
     );
   }
@@ -88,11 +96,13 @@ export class TokenBucketService implements OnModuleInit {
 
     if (!wasSet) {
       for (let attempt = 1; attempt <= retries; attempt++) {
+        const delay = timeout * Math.pow(2, attempt - 1);
+
         this.logger.debug(
-          `Lock attempt ${attempt} failed, retrying in ${timeout}ms...`,
+          `Lock attempt ${attempt} failed, retrying in ${delay}ms...`,
         );
 
-        await setTimeout(timeout * attempt);
+        await setTimeout(delay);
 
         const retrySet = await this.redisClient.set(lockKey, clientLockId, {
           NX: true,
@@ -100,7 +110,7 @@ export class TokenBucketService implements OnModuleInit {
         });
 
         if (retrySet) {
-          break;
+          return clientLockId;
         }
       }
       return null;
@@ -111,10 +121,14 @@ export class TokenBucketService implements OnModuleInit {
 
   private async unlock(currentClientLockId: string): Promise<void> {
     const lockKey = this.getLockKey();
-    const clientLockId = await this.redisClient.get(lockKey);
 
-    if (clientLockId === currentClientLockId) {
-      await this.redisClient.del(lockKey);
+    try {
+      await this.redisClient.eval(this.UNLOCK_SCRIPT, {
+        keys: [lockKey],
+        arguments: [currentClientLockId],
+      });
+    } catch (error) {
+      this.logger.error('Failed to unlock', error);
     }
   }
 

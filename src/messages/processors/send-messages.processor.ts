@@ -1,6 +1,6 @@
-import { InjectQueue, Processor, WorkerHost } from '@nestjs/bullmq';
+import { Processor, WorkerHost } from '@nestjs/bullmq';
 import { QUEUES } from '../constants';
-import { Job, Queue } from 'bullmq';
+import { Job } from 'bullmq';
 import { Message, MessageProps } from '../entities';
 import { Logger } from '@nestjs/common';
 import { MessagesService, TokenBucketService } from '../services';
@@ -10,8 +10,6 @@ export class SendMessagesProcessor extends WorkerHost {
   private readonly logger = new Logger(SendMessagesProcessor.name);
 
   constructor(
-    @InjectQueue(QUEUES.MESSAGE_SEND_QUEUE)
-    private readonly sendMessagesQueue: Queue,
     private readonly tokenBucketService: TokenBucketService,
     private readonly messagesService: MessagesService,
   ) {
@@ -33,9 +31,6 @@ export class SendMessagesProcessor extends WorkerHost {
       `No available API tokens for message ID: ${job.data.id}. Re-queuing...`,
     );
 
-    await this.sendMessagesQueue.add('message', job.data, {
-      jobId: job.id,
-      delay: this.tokenBucketService.getTokenRequestLimitMs(),
-    });
+    throw new Error('No available API tokens');
   }
 }
