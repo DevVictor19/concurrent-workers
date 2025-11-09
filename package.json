@@ -28,6 +28,7 @@
     "bullmq": "^5.63.0",
     "redis": "^5.9.0",
     "redlock": "5.0.0-beta.2",
+    "redlock-universal": "^0.7.0",
     "reflect-metadata": "^0.2.2",
     "rxjs": "^7.8.1"
   },

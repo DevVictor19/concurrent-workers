@@ -32,6 +32,9 @@ importers:
       redlock:
         specifier: 5.0.0-beta.2
         version: 5.0.0-beta.2
+      redlock-universal:
+        specifier: ^0.7.0
+        version: 0.7.0(ioredis@5.8.2)(redis@5.9.0)
       reflect-metadata:
         specifier: ^0.2.2
         version: 0.2.2
@@ -2656,6 +2659,18 @@ packages:
   redis@5.9.0:
     resolution: {integrity: sha512-E8dQVLSyH6UE/C9darFuwq4usOPrqfZ1864kI4RFbr5Oj9ioB9qPF0oJMwX7s8mf6sPYrz84x/Dx1PGF3/0EaQ==}
     engines: {node: '>= 18'}
+
+  redlock-universal@0.7.0:
+    resolution: {integrity: sha512-iso8OVVSYog+XaYL0yEBzevpeliRQ+LyMbtn2Kogwyut8D+c/zzkHiYJmv4PIE0fPH1cKKdFCVOLks24OheWPQ==}
+    engines: {node: '>=22.0.0'}
+    peerDependencies:
+      ioredis: '>=5.0.0'
+      redis: '>=4.0.0'
+    peerDependenciesMeta:
+      ioredis:
+        optional: true
+      redis:
+        optional: true
 
   redlock@5.0.0-beta.2:
     resolution: {integrity: sha512-2RDWXg5jgRptDrB1w9O/JgSZC0j7y4SlaXnor93H/UJm/QyDiFgBKNtrh0TI6oCXqYSaSoXxFh6Sd3VtYfhRXw==}
@@ -6127,6 +6142,11 @@ snapshots:
       '@redis/json': 5.9.0(@redis/client@5.9.0)
       '@redis/search': 5.9.0(@redis/client@5.9.0)
       '@redis/time-series': 5.9.0(@redis/client@5.9.0)
+
+  redlock-universal@0.7.0(ioredis@5.8.2)(redis@5.9.0):
+    optionalDependencies:
+      ioredis: 5.8.2
+      redis: 5.9.0
 
   redlock@5.0.0-beta.2:
     dependencies:
